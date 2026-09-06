@@ -33,47 +33,7 @@ positive rate without manual threshold tuning and without ever seeing failure da
 
 ---
 
-## Datasets
-
-We evaluate on two datasets:
-
-- **BotFails** ([project page](https://cea-list.github.io/FIDeL/)) — a public benchmark for
-  robotic failure detection. We retain the 4 tasks involving rigid, visually distinguishable
-  objects: Table-setting, Dish storing, Vegetable sorting, Groceries sorting.
-- **Ours** — a new dataset of two relationally challenging manipulation tasks:
-
-| Task | Split | Robot | # Episodes | # Frames | FPS | Cameras | Action dim |
-| --- | --- | --- | ---: | ---: | ---: | --- | ---: |
-| Table-setting | Expert | ALOHA | 100 | 67,341 | 15 | 4 views | 9 |
-| Table-setting | Test | ALOHA | 21 | 13,471 | 15 | 4 views | 9 |
-| Waste sorting | Expert | SO-100 | 100 | 59,562 | 30 | Top view | 6 |
-| Waste sorting | Test | SO-100 | 51 | 30,378 | 30 | Top view | 6 |
-
----
-
-## Results
-
-Across both datasets and all metrics, the object-centric methods outperform prior work:
-
-- **AUPR 0.69–0.78** and **MCC 0.67–0.72**, against 0.47 / 0.40 for the strongest baseline.
-- TPC is best on BotFails (0.666 MCC), where data is scarce; GnnT is best on the more dynamic
-  Watchdog dataset (0.719 MCC).
-- After conformal calibration, end-to-end MCC reaches **0.657** (GnnT, Watchdog) and **0.483**
-  (TPC, BotFails), while FIDeL and FAIL-Detect remain below 0.15.
-
----
-
-## Repository layout
-
-```
-index.html            project page
-static/css            Bulma + page styles
-static/js             Bulma carousel / slider
-static/images         figures used by the page
-release_videos/       result videos, uploaded as GitHub Release assets (not committed)
-```
-
-### Videos
+## Videos
 
 Result videos are **not committed to this repository**. They are attached as assets of the
 GitHub release tagged `video`, and the page streams them from there. To (re)publish them:

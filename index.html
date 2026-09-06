@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html>
+
+
+<head>
+  <meta charset="utf-8">
+  <meta name="description"
+    content="Robot-WATCHDOG: a self-supervised failure detection framework for robotic manipulation based on object-centric spatio-temporal graphs. CoRL 2026.">
+  <meta property="og:title" content="Robot-WATCHDOG: Failure Detection through Object-Centric Graph Representation" />
+  <meta property="og:description"
+    content="A self-supervised failure detection framework that represents manipulation scenes as spatio-temporal graphs over tracked objects, combining a predictive graph transformer (GnnT) with a non-parametric few-shot detector (TPC). CoRL 2026." />
+  <meta property="og:url" content="https://cea-list.github.io/Robot-WATCHDOG/" />
+  <meta property="og:image" content="static/images/teaser.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+
+
+  <meta name="twitter:title" content="Robot-WATCHDOG: Failure Detection through Object-Centric Graph Representation">
+  <meta name="twitter:description"
+    content="Real-time failure detection for learned robotic policies via object-centric spatio-temporal graphs. CoRL 2026.">
+  <meta name="twitter:image" content="static/images/teaser.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="keywords"
+    content="failure detection, anomaly detection, robot learning, imitation learning, object-centric representation, scene graph, graph neural network, graph transformer, conformal prediction, CoRL 2026">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+  <title>Robot-WATCHDOG: Failure Detection through Object-Centric Graph Representation</title>
+  <link rel="icon" type="image/x-icon" href="static/images/favicon.ico">
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro" rel="stylesheet">
+
+  <link rel="stylesheet" href="static/css/bulma.min.css">
+  <link rel="stylesheet" href="static/css/bulma-carousel.min.css">
+  <link rel="stylesheet" href="static/css/bulma-slider.min.css">
+  <link rel="stylesheet" href="static/css/fontawesome.all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  <link rel="stylesheet" href="static/css/index.css">
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script defer src="static/js/fontawesome.all.min.js"></script>
+  <script src="static/js/bulma-carousel.min.js"></script>
+  <script src="static/js/bulma-slider.min.js"></script>
+  <script src="static/js/index.js"></script>
+  <!-- MathJax for LaTeX rendering -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+</head>
+
+<body>
+
+
+  <section class="hero">
+    <div class="hero-body">
+      <div class="container is-max-desktop">
+        <div class="columns is-centered">
+          <div class="column has-text-centered">
+            <h1 class="title is-1 publication-title">Robot-WATCHDOG: Failure Detection through Object-Centric Graph
+              Representation</h1>
+            <div class="is-size-5 publication-authors">
+              <span class="author-block">
+                <a href="https://quentinrolld.github.io/" target="_blank">Quentin Rolland</a><sup>1,2</sup>,</span>
+              <span class="author-block">
+                <a href="https://fabricemdc.ocfmcreation.com/" target="_blank">Fabrice Mayran de
+                  Chamisso</a><sup>1</sup>,</span>
+              <span class="author-block">
+                <a href="https://members.loria.fr/JBMouret/" target="_blank">Jean-Baptiste Mouret</a><sup>2,3</sup>
+              </span>
+            </div>
+
+
+            <div class="is-size-5 publication-authors">
+              <span class="author-block"><sup>1</sup>Université Paris-Saclay, CEA, List, F-91120, Palaiseau,
+                France</span><br>
+              <span class="author-block"><sup>2</sup>Inria, CNRS, Université de Lorraine, LORIA, F-54000 Nancy,
+                France</span><br>
+              <span class="author-block"><sup>3</sup>Bleu Robotics, Paris, France</span>
+            </div>
+
+            <div class="is-size-5 publication-authors">
+              <span class="author-block" style="font-weight: bold; color: #5a5a5a;">CoRL 2026</span>
+            </div>
+
+            <div class="column has-text-centered">
+              <div class="publication-logos"
+                style="display: flex; justify-content: center; align-items: center; gap: 40px; margin-top: 20px; flex-wrap: wrap;">
+                <img src="static/images/CEA.png" alt="CEA" style="height: 55px;">
+                <img src="static/images/Inria.png" alt="INRIA" style="height: 30px;">
+                <img src="static/images/Univ_lorraine.png" alt="Univ Lorraine" style="height: 40px;">
+                <img src="static/images/Univ_saclay.png" alt="Univ Saclay" style="height: 40px;">
+              </div>
+
+              <div class="is-size-5">
+                <div class="conference-logo" style="margin-top: 30px;">
+                  <img src="static/images/CoRL_logo.png" alt="CoRL 2026"
+                    style="max-height: 130px; width: auto; max-width: 100%;">
+                </div>
+              </div>
+            </div>
+
+
+            <div class="column has-text-centered">
+              <div class="publication-links">
+
+                <!-- TODO: replace ARXIV_ID_HERE with the real arXiv identifier before publishing. -->
+                <span class="link-block">
+                  <a href="https://arxiv.org/abs/ARXIV_ID_HERE" target="_blank"
+                    class="external-link button is-normal is-rounded is-dark">
+                    <span class="icon">
+                      <i class="ai ai-arxiv"></i>
+                    </span>
+                    <span>Paper</span>
+                  </a>
+                </span>
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- Teaser figure -->
+  <section class="hero teaser">
+    <div class="container is-max-desktop">
+      <div class="hero-body">
+        <img src="static/images/teaser.png" alt="Robot-WATCHDOG teaser: detecting failures through object-centric relational dynamics"
+          style="width: 100%; height: auto;" />
+        <h2 class="subtitle has-text-centered">
+          <strong>Detecting failures through object-centric relational dynamics.</strong> Robot-WATCHDOG represents
+          manipulation scenes as spatio-temporal graphs, enabling robust detection of relational and temporal errors
+          beyond raw visual or trajectory-based methods.
+        </h2>
+      </div>
+    </div>
+  </section>
+  <!-- End teaser figure -->
+
+
+  <!-- Paper abstract -->
+  <section class="section hero is-light">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-four-fifths">
+          <h2 class="title is-3">Abstract</h2>
+          <div class="content has-text-justified">
+            <p>
+              Reliable real-time failure detection is critical for deploying learned robotic policies in real-world
+              environments. However, explicitly enumerating failures is intractable in open-world settings, making
+              failure detection from nominal demonstrations alone a necessary alternative. Existing approaches face key
+              limitations: purely visual methods are highly sensitive to benign background variations, while kinematic
+              monitors lack awareness of the surrounding environment. Crucially, both often fail to capture
+              <em>relational</em> errors involving object identity, spatial arrangement, or task progression, such as
+              grasping the wrong object or violating interaction structure. In this work, we introduce
+              <strong>Robot-WATCHDOG</strong>, a self-supervised failure detection framework based on an object-centric
+              representation of dynamic scenes as spatio-temporal graphs over tracked labeled objects and their
+              interactions. Within this representation, the framework deploys two complementary methods to adapt across
+              data regimes. For data-rich settings, we propose <strong>GnnT</strong>, a predictive graph transformer
+              that identifies failures as deviations from learned object-centric spatio-temporal dynamics. To address
+              data scarcity, we introduce <strong>Trajectory Projection and Correlation (TPC)</strong>, a
+              non-parametric method that detects failures through geometric consistency and changes in object-relation
+              dynamics in extreme few-shot scenarios. We evaluate the framework on a public benchmark and a newly
+              collected dataset featuring relationally challenging manipulation tasks. Results show that modeling
+              object-centric spatial and temporal interactions improves failure detection over existing baselines and
+              enables reliable detection of failure modes that are difficult to capture using visual or kinematic
+              monitoring alone.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- End paper abstract -->
+
+
+  <!-- Motivation -->
+  <section class="section hero is-small">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-four-fifths">
+          <h2 class="title is-3">Relational failures</h2>
+          <div class="content has-text-justified">
+            <p>
+              A substantial class of failures in robotic manipulation does not arise from abnormal motion or corrupted
+              observations, but from <strong>incorrect interactions between otherwise familiar objects</strong>:
+              grasping the wrong item, violating task-order constraints, or placing an object in an incorrect spatial
+              relation to others. These errors often produce perfectly nominal kinematic profiles and only subtle
+              pixel-level changes, which makes them nearly invisible to action-consistency metrics and to standard
+              visual anomaly detectors alike.
+            </p>
+            <p>
+              The central idea of this work is to recast failure detection as <strong>monitoring the evolution of
+                object interactions over time</strong>. Rather than treating visual and kinematic signals as separate
+              modalities, we represent the scene as a spatio-temporal graph of interacting objects, where nodes encode
+              object states and edges encode their pairwise spatial relationships throughout execution. This
+              formulation generalizes prior monitoring approaches — visual detectors can be read as operating on node
+              appearance, kinematic monitors as tracking motion along trajectories — while additionally exposing the
+              relational structure required to detect task-relevant interaction failures.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- End motivation -->
+
+
+  <!-- Methodology -->
+  <section class="section hero is-light">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-four-fifths">
+          <h2 class="title is-3">Methodology</h2>
+          <div class="content has-text-justified">
+            <p>
+              Each episode is converted from RGB observations into a sequence of 2D trajectories over tracked labeled
+              objects, using a vision-language initialization model together with a tracking pipeline. This yields a
+              temporal graph sequence \( \{ \mathcal{G}_t \}_{t=1}^{T} \), where at each time step the scene is
+              abstracted as \( \mathcal{G}_t = (V, E_t, X_t) \). Vertex features encode absolute positions and
+              instantaneous velocities, \( x_{i,t} = [\, p_{i,t},\; p_{i,t} - p_{i,t-1} \,] \), while each edge encodes
+              the explicit pairwise spatial relation between two entities from their relative displacement
+              \( o_{ij,t} = p_{j,t} - p_{i,t} \):
+              \( e_{ij,t} = \left[\, o^{(x)}_{ij,t},\, o^{(y)}_{ij,t},\, d_{ij,t},\, \cos(\theta_{ij,t}),\,
+              \sin(\theta_{ij,t}) \,\right] \in \mathbb{R}^5 \).
+            </p>
+            <p>
+              This representation has three useful properties for failure detection: (i) <strong>translation
+                invariance</strong> through relative edge encoding, reducing sensitivity to workspace shifts; (ii)
+              <strong>explicit modeling of pairwise object interactions</strong>, so that failures involving object
+              identity or spatial arrangement are represented directly; and (iii) <strong>temporal
+                consistency</strong> through velocity features and graph sequences, enabling detection of both
+              instantaneous and sequential deviations.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- End methodology -->
+
+
+  <!-- Pipeline figure -->
+  <section class="hero is-light">
+    <div class="hero-body">
+      <div class="container">
+        <div class="single-image-display">
+          <div class="item">
+            <img src="static/images/method.png" alt="Overview of the Robot-WATCHDOG pipeline" />
+            <h2 class="subtitle has-text-centered">
+              <strong>Overview of the Robot-WATCHDOG pipeline.</strong><br><br>
+              <span style="color: #b8860b;"><strong>Stage 1 — Graph extraction</strong></span> — object-centric graph
+              extraction from RGB observations and robot proprioception.<br>
+              <span style="color: darkgreen;"><strong>Stage 2 — Failure detection</strong></span> — the graph is fed to
+              the detector (illustrated with GnnT), which outputs a scalar failure score \( S_{\text{total}} \in
+              \mathbb{R} \) at each timestep.<br>
+              <span style="color: darkblue;"><strong>Stage 3 — Conformal prediction</strong></span> — \(
+              S_{\text{total}} \) is compared to a threshold calibrated offline on demonstration data, yielding a
+              binary decision (failure / no failure).
+            </h2>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- Graph extraction figure -->
+  <section class="hero is-small">
+    <div class="hero-body">
+      <div class="container">
+        <div class="single-image-display">
+          <div class="item">
+            <img src="static/images/graph_extraction.jpg"
+              alt="Tracked object trajectories on the table-setting and waste-sorting tasks" />
+            <h2 class="subtitle has-text-centered">
+              <strong>From video to tracked objects.</strong> Task-relevant entities are initialized with a
+              vision-language model and followed by a tracking pipeline, turning each episode into a set of 2D object
+              trajectories — here on the table-setting task (top) and the waste-sorting task (bottom).
+            </h2>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- Two detectors -->
+  <section class="section hero is-light">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered">
+        <div class="column is-four-fifths">
+          <h2 class="title is-3 has-text-centered">Two detectors, two data regimes</h2>
+          <div class="content has-text-justified">
+            <p>
+              <strong>GnnT — predictive spatio-temporal dynamics.</strong> Spatial structure is encoded with
+              <a href="https://arxiv.org/abs/2105.14491" target="_blank">GATv2</a> dynamic attention, so that the
+              network can weight task-relevant interactions (e.g. an end-effector approaching a target object) more
+              strongly than distant or weakly coupled entities. To model action–reaction delays, a sliding window of
+              the past \( m \) spatial embeddings is flattened into \( m \times C \) tokens and processed by a
+              Transformer encoder, with a composite positional encoding accounting for relative time within the
+              window, object identity, and global episode progress. The current-step tokens are projected by an MLP to
+              predict object positions over a horizon \( L \). The network is trained <em>solely on nominal
+                demonstrations</em>, minimizing trajectory MSE together with an edge-consistency term that encourages
+              agreement between predicted and observed pairwise spatial relations:
+              \( \mathcal{L} = \lambda_p \mathcal{L}_{\text{pos}} + \lambda_e \mathcal{L}_{\text{edge}} \).
+              At runtime, failures appear as prediction error.
+            </p>
+            <p>
+              <strong>TPC — extreme few-shot fallback.</strong> With fewer than about 25 episodes, predictive models
+              overfit. Trajectory Projection and Correlation is a non-parametric alternative: it scores individual
+              kinematic deviation as the time-weighted orthogonal projection distance to the closest expert
+              trajectory, and adds a correlation penalty measuring the \( \ell_1 \) divergence between the pairwise
+              Pearson correlation matrices of the observed scene and of the nominal dataset. The result is a purely
+              geometric detector that needs no training.
+            </p>
+            <p>
+              <strong>Calibration by conformal prediction.</strong> Both detectors are calibrated the same way, which
+              removes any arbitrary task-specific threshold tuning. Non-conformity scores are computed on a held-out
+              calibration set of nominal episodes, and for a user-specified tolerance \( \alpha \in (0,1) \) the
+              decision threshold is the \( (1-\alpha) \)-quantile of those scores. Under exchangeability, this gives a
+              <strong>mathematically guaranteed upper bound on the false positive rate</strong>, without ever exposing
+              the model to failure data.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- Dataset -->
+  <section class="section hero is-small">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-four-fifths">
+          <h2 class="title is-3">Datasets</h2>
+          <div class="content has-text-justified">
+            <p>
+              We evaluate Robot-WATCHDOG on two complementary datasets. The first is
+              <a href="https://cea-list.github.io/FIDeL/" target="_blank"><strong>BotFails</strong></a>, a public
+              benchmark for robotic failure detection collected with
+              <a href="https://github.com/huggingface/lerobot" target="_blank">LeRobot</a>. Of its 10 manipulation
+              tasks we retain the 4 involving rigid, visually distinguishable objects — <em>Table-setting</em>,
+              <em>Dish storing</em>, <em>Vegetable sorting</em> and <em>Groceries sorting</em>; tasks involving
+              deformable or fluid interactions are excluded, as they violate the discrete object abstraction
+              underlying our method.
+            </p>
+            <p>
+              The second is a <strong>new dataset released with this work</strong>, made of two manipulation tasks with
+              increased relational and dynamic complexity. <em>Table-setting</em> is a structured assembly task on an
+              <strong>ALOHA</strong> platform, where the robot must place plates and utensils in predefined spatial
+              configurations and in the correct temporal order — emphasizing relational correctness. <em>Waste
+                sorting</em> is a dynamic task on an <strong>SO-100</strong> arm, where objects arrive on a moving
+              conveyor belt, so that positions evolve continuously and both initial conditions and interaction timing
+              vary from episode to episode. In total the dataset provides <strong>272 episodes</strong> and
+              <strong>170,752 annotated frames</strong> of RGB video, proprioception and language, split into expert
+              demonstrations for training and test sets containing both nominal and failure trajectories.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- Dataset table -->
+  <section class="hero is-small">
+    <div class="hero-body">
+      <div class="container is-max-desktop">
+        <div class="table-container">
+          <table class="table is-fullwidth is-striped is-hoverable">
+            <thead>
+              <tr>
+                <th>Task</th>
+                <th>Split</th>
+                <th>Robot</th>
+                <th class="has-text-right"># Episodes</th>
+                <th class="has-text-right"># Frames</th>
+                <th class="has-text-right">FPS</th>
+                <th>Cameras</th>
+                <th class="has-text-right">Action dim</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Table-setting</td>
+                <td>Expert</td>
+                <td>ALOHA</td>
+                <td class="has-text-right">100</td>
+                <td class="has-text-right">67,341</td>
+                <td class="has-text-right">15</td>
+                <td>4 views</td>
+                <td class="has-text-right">9</td>
+              </tr>
+              <tr>
+                <td>Table-setting</td>
+                <td>Test</td>
+                <td>ALOHA</td>
+                <td class="has-text-right">21</td>
+                <td class="has-text-right">13,471</td>
+                <td class="has-text-right">15</td>
+                <td>4 views</td>
+                <td class="has-text-right">9</td>
+              </tr>
+              <tr>
+                <td>Waste sorting</td>
+                <td>Expert</td>
+                <td>SO-100</td>
+                <td class="has-text-right">100</td>
+                <td class="has-text-right">59,562</td>
+                <td class="has-text-right">30</td>
+                <td>Top view</td>
+                <td class="has-text-right">6</td>
+              </tr>
+              <tr>
+                <td>Waste sorting</td>
+                <td>Test</td>
+                <td>SO-100</td>
+                <td class="has-text-right">51</td>
+                <td class="has-text-right">30,378</td>
+                <td class="has-text-right">30</td>
+                <td>Top view</td>
+                <td class="has-text-right">6</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <h2 class="subtitle has-text-centered">Statistics of the dataset introduced with Robot-WATCHDOG.</h2>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- Dataset figure -->
+  <section class="hero is-light">
+    <div class="hero-body">
+      <div class="container">
+        <div class="single-image-display">
+          <div class="item">
+            <img src="static/images/dataset.jpg" alt="Overview of the Robot-WATCHDOG evaluation dataset" />
+            <h2 class="subtitle has-text-centered">
+              <strong>Overview of the Robot-WATCHDOG evaluation dataset.</strong> A structured Table-setting task
+              (left) and a dynamic Waste sorting task (right). The top row shows in-distribution nominal expert
+              demonstrations. The following rows show out-of-distribution scenarios, split into critical task failures
+              (<span style="color: #c0392b;"><strong>red borders</strong></span>) and benign visual variations
+              (<span style="color: #d98a1f;"><strong>orange borders</strong></span>):<br><br>
+              ① <strong>Spatial misplacement</strong> — objects arranged with an incorrect offset.<br>
+              ② <strong>Object inversion</strong> — the target locations of two items are swapped.<br>
+              ③ <strong>Grasping failure</strong> — the object is dropped.<br>
+              ④ <strong>Benign visual variation</strong> — an intrusive distractor object; this highlights robustness
+              to visual clutter, which typically triggers false positives in baseline anomaly detectors.<br>
+              ⑤ <strong>Identity sorting error</strong> — an item is placed into the incorrect bin.<br>
+              ⑥ <strong>Missed object</strong> — the robot fails to make a decision or to initiate a grasp.
+            </h2>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- Results -->
+  <section class="section hero is-small">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-four-fifths">
+          <h2 class="title is-3">Results</h2>
+          <div class="content has-text-justified">
+            <p>
+              We compare against trajectory-matching baselines (AP-RMS, AP-Fréchet, Soft-DTW), learned representations
+              (logpZO, lopO, AE-Recon) and the visual-semantic detector
+              <a href="https://cea-list.github.io/FIDeL/" target="_blank">FIDeL</a>. Across both datasets and all
+              metrics, our object-centric methods consistently outperform prior work: TPC and GnnT reach AUPR scores of
+              <strong>0.69–0.78</strong> and MCC scores of <strong>0.67–0.72</strong>, whereas the strongest baseline
+              reaches only 0.47 and 0.40.
+            </p>
+            <p>
+              The two variants split along data availability, exactly as designed. <strong>TPC</strong> achieves the
+              highest MCC on BotFails (<strong>0.666</strong>), where limited training data favours its non-parametric
+              formulation, while <strong>GnnT</strong> performs best on the more dynamic Watchdog dataset
+              (<strong>0.719</strong> MCC), showing that predictive spatio-temporal modeling benefits continuous and
+              delayed interactions. Trajectory metrics perform substantially worse because they evaluate trajectories
+              independently and therefore cannot capture relational deviations between objects; density,
+              reconstruction and visual baselines are less consistent, suggesting that implicit latent representations
+              struggle to encode structured object interactions robustly.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- Threshold-independent results -->
+  <section class="hero is-small">
+    <div class="hero-body">
+      <div class="container has-text-centered">
+        <div class="single-image-display">
+          <div class="item" style="max-width: 100%; width: 100%;">
+            <img src="static/images/results_threshold_independent.png"
+              alt="Threshold-independent discriminative performance: AUPR and MCC" class="mx-auto"
+              style="max-width: 100%; height: auto;" />
+            <h2 class="subtitle has-text-centered">
+              <strong>Threshold-independent discriminative performance.</strong> Average Area Under the
+              Precision–Recall Curve (AUPR) and maximum Matthews Correlation Coefficient (MCC) across the BotFails and
+              Watchdog datasets. Error bars denote the standard deviation across task subsets; best results are framed
+              in purple with a star.
+            </h2>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- End-to-end results -->
+  <section class="hero is-light">
+    <div class="hero-body">
+      <div class="container has-text-centered">
+        <div class="columns is-centered">
+          <div class="column is-two-thirds">
+            <img src="static/images/results_end2end.png" alt="End-to-end failure detection performance after conformal calibration"
+              class="mx-auto" style="max-width: 100%; height: auto;" />
+            <h2 class="subtitle has-text-centered">
+              <strong>End-to-end failure detection after conformal calibration</strong> (MCC, averaged across tasks,
+              seeds and configurations). Once Conformal Prediction converts anomaly scores into binary alerts —
+              without any manual threshold tuning — both variants outperform prior methods by a clear margin: GnnT
+              reaches <strong>0.657</strong> MCC on the Watchdog dataset and TPC <strong>0.483</strong> on BotFails,
+              while FIDeL and FAIL-Detect remain below 0.15. Improvements in raw anomaly scoring therefore transfer
+              reliably to calibrated online detection.
+            </h2>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- Qualitative -->
+  <section class="hero is-small">
+    <div class="hero-body">
+      <div class="container">
+        <h2 class="title is-3 has-text-centered">Qualitative results</h2>
+        <div class="single-image-display">
+          <div class="item">
+            <img src="static/images/qualitative.png" alt="Qualitative failure detection on the table-setting task" />
+            <h2 class="subtitle has-text-centered">
+              <strong>Qualitative failure detection on the Table-setting task.</strong> <em>(Left)</em> Nominal
+              execution (Ep. 1): the global score remains safely below the CP threshold. <em>(Right)</em> Relational
+              failure (Ep. 18): the cup is spatially misplaced. Because of natural spatial variability, absolute
+              kinematics cannot detect this relational error — but the object-centric graph captures the relational
+              positional inconsistency, triggering a global score spike above the threshold that aligns with the
+              misplaced cup's elevated local anomaly score (red trajectory points).
+            </h2>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="hero is-light">
+    <div class="hero-body">
+      <div class="container">
+        <div class="single-image-display">
+          <div class="item">
+            <img src="static/images/tpc_set_the_table.png" alt="Per-object anomaly scores on the table-setting task" />
+            <h2 class="subtitle has-text-centered">
+              <strong>Per-object anomaly scores — Table-setting.</strong> Expert trajectories (blue) and the observed
+              inference trajectory, coloured by anomaly score, for each tracked entity. The score localizes
+              <em>which</em> object is responsible for the deviation, not merely that a deviation occurred.
+            </h2>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="hero is-small">
+    <div class="hero-body">
+      <div class="container">
+        <div class="single-image-display">
+          <div class="item">
+            <img src="static/images/tpc_sort_vegetables.png" alt="Per-object anomaly scores on the vegetable sorting task" />
+            <h2 class="subtitle has-text-centered">
+              <strong>Per-object anomaly scores — Vegetable sorting</strong> (BotFails). Same visualization on a
+              sorting task, where the deviation concerns which object is handled and where it is placed.
+            </h2>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="hero is-light">
+    <div class="hero-body">
+      <div class="container">
+        <div class="single-image-display">
+          <div class="item">
+            <img src="static/images/trajectories_density.png" alt="Density of expert object trajectories" />
+            <h2 class="subtitle has-text-centered">
+              <strong>Density of expert object trajectories</strong> across the nominal demonstrations, per tracked
+              object. The concentration of each object's expert distribution is what makes relational deviations
+              measurable — and what conformal prediction calibrates against.
+            </h2>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- Video Grid Section -->
+  <!--
+       Videos are hosted as assets of the GitHub release tagged `video`, not committed to the repo.
+       Upload the files from `release_videos/` to that release, keeping the exact filenames below:
+         table_setting_nominal.mp4
+         table_setting_failure_wrong_side.mp4
+         table_setting_failure_misplaced.mp4
+         waste_sorting_nominal.mp4
+         waste_sorting_failure_wrong_bin.mp4
+         waste_sorting_failure_unsorted.mp4
+  -->
+  <section class="section">
+    <div class="container">
+      <h2 class="title is-3 has-text-centered">Real-time detection videos</h2>
+      <div class="columns is-centered">
+        <div class="column is-four-fifths">
+          <div class="content has-text-justified">
+            <p class="has-text-centered">
+              GnnT running online on the two tasks of the Watchdog dataset. The overlay shows the tracked object
+              nodes, the instantaneous failure score against its conformally calibrated threshold, and the per-node
+              status.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="title is-4 has-text-centered">Table-setting (ALOHA)</h3>
+      <div class="columns is-multiline is-centered">
+
+        <div class="column is-one-third has-text-centered">
+          <figure>
+            <video controls muted loop autoplay playsinline width="100%" style="border-radius: 8px;">
+              <source
+                src="https://github.com/CEA-LIST/Robot-WATCHDOG/releases/download/video/table_setting_nominal.mp4"
+                type="video/mp4">
+              Your browser does not support the video tag.
+            </video>
+            <figcaption class="mt-2"><strong>Nominal execution.</strong> The score stays below the CP threshold for the
+              whole episode.</figcaption>
+          </figure>
+        </div>
+
+        <div class="column is-one-third has-text-centered">
+          <figure>
+            <video controls muted loop autoplay playsinline width="100%" style="border-radius: 8px;">
+              <source
+                src="https://github.com/CEA-LIST/Robot-WATCHDOG/releases/download/video/table_setting_failure_misplaced.mp4"
+                type="video/mp4">
+            </video>
+            <figcaption class="mt-2"><strong>Relational failure — misplaced cup.</strong> The episode analysed above:
+              the score crosses the threshold as the cup settles in the wrong spatial relation to the plate.
+            </figcaption>
+          </figure>
+        </div>
+
+        <div class="column is-one-third has-text-centered">
+          <figure>
+            <video controls muted loop autoplay playsinline width="100%" style="border-radius: 8px;">
+              <source
+                src="https://github.com/CEA-LIST/Robot-WATCHDOG/releases/download/video/table_setting_failure_wrong_side.mp4"
+                type="video/mp4">
+            </video>
+            <figcaption class="mt-2"><strong>Relational failure — wrong side.</strong> The glass ends up on the
+              opposite side of the plate from every expert demonstration; motion alone looks nominal.</figcaption>
+          </figure>
+        </div>
+
+      </div>
+
+      <h3 class="title is-4 has-text-centered mt-5">Waste sorting on a conveyor belt (SO-100)</h3>
+      <div class="columns is-multiline is-centered">
+
+        <div class="column is-one-third has-text-centered">
+          <figure>
+            <video controls muted loop autoplay playsinline width="100%" style="border-radius: 8px;">
+              <source
+                src="https://github.com/CEA-LIST/Robot-WATCHDOG/releases/download/video/waste_sorting_nominal.mp4"
+                type="video/mp4">
+            </video>
+            <figcaption class="mt-2"><strong>Nominal execution.</strong> Each item reaches its correct bin; the score
+              never crosses the threshold.</figcaption>
+          </figure>
+        </div>
+
+        <div class="column is-one-third has-text-centered">
+          <figure>
+            <video controls muted loop autoplay playsinline width="100%" style="border-radius: 8px;">
+              <source
+                src="https://github.com/CEA-LIST/Robot-WATCHDOG/releases/download/video/waste_sorting_failure_wrong_bin.mp4"
+                type="video/mp4">
+            </video>
+            <figcaption class="mt-2"><strong>Identity sorting error.</strong> A plastic item is dropped into the cans
+              bin — a purely relational error, detected as the score jumps well above the threshold.</figcaption>
+          </figure>
+        </div>
+
+        <div class="column is-one-third has-text-centered">
+          <figure>
+            <video controls muted loop autoplay playsinline width="100%" style="border-radius: 8px;">
+              <source
+                src="https://github.com/CEA-LIST/Robot-WATCHDOG/releases/download/video/waste_sorting_failure_unsorted.mp4"
+                type="video/mp4">
+            </video>
+            <figcaption class="mt-2"><strong>Missed objects.</strong> Items are left unsorted at the end of the
+              episode; the score rises and stays above the threshold.</figcaption>
+          </figure>
+        </div>
+
+      </div>
+    </div>
+  </section>
+  <!-- End video grid -->
+
+
+  <!-- Limitations -->
+  <section class="section hero is-light">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-four-fifths">
+          <h2 class="title is-3">Limitations</h2>
+          <div class="content has-text-justified">
+            <p>
+              Robot-WATCHDOG relies on a discrete object-centric abstraction, which limits applicability to tasks
+              involving highly deformable materials, fluids, or interaction domains without a clear object
+              decomposition (e.g. painting or soldering). Performance also depends on the upstream vision-language
+              tracking pipeline: severe occlusions, missed detections or identity switches degrade graph quality and
+              propagate to the anomaly detector. Finally, the current formulation models object centroids only, and
+              therefore cannot capture failures involving orientation or fine-grained pose — extending the graph
+              representation with reliable 6D pose estimates is a natural direction for future work.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!--BibTex citation -->
+  <section class="section" id="BibTeX">
+    <div class="container is-max-desktop content">
+      <h2 class="title">BibTeX</h2>
+      <pre><code>@inproceedings{rolland2026robotwatchdog,
+  title={Robot-WATCHDOG: Failure Detection through Object-Centric Graph Representation},
+  author={Rolland, Quentin and Mayran de Chamisso, Fabrice and Mouret, Jean-Baptiste},
+  booktitle={Conference on Robot Learning (CoRL)},
+  year={2026},
+}</code></pre>
+    </div>
+  </section>
+  <!--End BibTex citation -->
+
+
+  <footer class="footer">
+    <div class="container">
+      <div class="columns is-centered">
+        <div class="column is-8">
+          <div class="content">
+
+            <p>
+              This page was built using the <a href="https://github.com/eliahuhorwitz/Academic-project-page-template"
+                target="_blank">Academic Project Page Template</a> which was adopted from the <a
+                href="https://nerfies.github.io" target="_blank">Nerfies</a> project page.
+              You are free to borrow the source code of this website, we just ask that you link back to this page in the
+              footer. <br> This website is licensed under a <a rel="license"
+                href="http://creativecommons.org/licenses/by-sa/4.0/" target="_blank">Creative
+                Commons Attribution-ShareAlike 4.0 International License</a>.
+            </p>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+</body>
+
+</html>

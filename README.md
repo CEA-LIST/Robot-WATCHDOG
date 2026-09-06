@@ -33,30 +33,6 @@ positive rate without manual threshold tuning and without ever seeing failure da
 
 ---
 
-## Videos
-
-Result videos are **not committed to this repository**. They are attached as assets of the
-GitHub release tagged `video`, and the page streams them from there. To (re)publish them:
-
-```bash
-gh release create video release_videos/*.mp4 --title "website_videos" --notes "Result videos for the project page"
-# or, if the release already exists:
-gh release upload video release_videos/*.mp4 --clobber
-```
-
-The page references these exact filenames:
-
-```
-table_setting_nominal.mp4
-table_setting_failure_wrong_side.mp4
-table_setting_failure_misplaced.mp4
-waste_sorting_nominal.mp4
-waste_sorting_failure_wrong_bin.mp4
-waste_sorting_failure_unsorted.mp4
-```
-
----
-
 ## Acknowledgments
 
 Parts of this project page were adopted from the [Nerfies](https://nerfies.github.io/) page.

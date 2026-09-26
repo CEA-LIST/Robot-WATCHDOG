@@ -182,22 +182,22 @@
   <!-- End paper abstract -->
 
 
-  <!-- Video mosaic (assets of the GitHub release tagged `videos`) -->
+  <!-- Video mosaic (H.264 re-encodes of the `videos` release assets) -->
   <section class="section hero is-small">
     <div class="container is-max-widescreen">
       <div class="video-mosaic">
-        <video muted loop playsinline preload="none"
-          src="https://github.com/CEA-LIST/Robot-WATCHDOG/releases/download/videos/Video_HAD_website_1.mp4"></video>
-        <video muted loop playsinline preload="none"
-          src="https://github.com/CEA-LIST/Robot-WATCHDOG/releases/download/videos/Video_HAD_website_2.mp4"></video>
-        <video muted loop playsinline preload="none"
-          src="https://github.com/CEA-LIST/Robot-WATCHDOG/releases/download/videos/Video_HAD_website_3.mp4"></video>
-        <video muted loop playsinline preload="none"
-          src="https://github.com/CEA-LIST/Robot-WATCHDOG/releases/download/videos/robot_watchdog_video_6.mp4"></video>
-        <video muted loop playsinline preload="none"
-          src="https://github.com/CEA-LIST/Robot-WATCHDOG/releases/download/videos/robot_watchdog_video_7.mp4"></video>
-        <video muted loop playsinline preload="none"
-          src="https://github.com/CEA-LIST/Robot-WATCHDOG/releases/download/videos/robot_watchdog_video_8.mp4"></video>
+        <video muted loop playsinline preload="metadata"
+          src="static/videos/Video_HAD_website_1.mp4"></video>
+        <video muted loop playsinline preload="metadata"
+          src="static/videos/Video_HAD_website_2.mp4"></video>
+        <video muted loop playsinline preload="metadata"
+          src="static/videos/Video_HAD_website_3.mp4"></video>
+        <video muted loop playsinline preload="metadata"
+          src="static/videos/robot_watchdog_video_6.mp4"></video>
+        <video muted loop playsinline preload="metadata"
+          src="static/videos/robot_watchdog_video_7.mp4"></video>
+        <video muted loop playsinline preload="metadata"
+          src="static/videos/robot_watchdog_video_8.mp4"></video>
       </div>
     </div>
   </section>
@@ -348,9 +348,7 @@
               <strong>Calibration by conformal prediction.</strong> Both detectors are calibrated the same way, which
               removes any arbitrary task-specific threshold tuning. Non-conformity scores are computed on a held-out
               calibration set of nominal episodes, and for a user-specified tolerance \( \alpha \in (0,1) \) the
-              decision threshold is the \( (1-\alpha) \)-quantile of those scores. Under exchangeability, this gives a
-              <strong>mathematically guaranteed upper bound on the false positive rate</strong>, without ever exposing
-              the model to failure data.
+              decision threshold is the \( (1-\alpha) \)-quantile of those scores.
             </p>
           </div>
         </div>

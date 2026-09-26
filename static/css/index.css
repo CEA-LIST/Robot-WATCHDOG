@@ -135,3 +135,46 @@ body {
 
 
 
+
+/* Figures: keep them narrower than the full page width */
+.single-image-display {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.single-image-display img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 0 auto;
+}
+
+.figure-small {
+  display: block;
+  width: 100%;
+  max-width: 440px;
+  height: auto;
+  margin: 0 auto;
+}
+
+/* Video mosaic below the abstract */
+.video-mosaic {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.video-mosaic video {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: 6px;
+  background: #000;
+  cursor: pointer;
+}
+
+@media screen and (max-width: 768px) {
+  .video-mosaic {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

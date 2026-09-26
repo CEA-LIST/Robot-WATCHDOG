@@ -182,6 +182,28 @@
   <!-- End paper abstract -->
 
 
+  <!-- Video mosaic (assets of the GitHub release tagged `videos`) -->
+  <section class="section hero is-small">
+    <div class="container is-max-widescreen">
+      <div class="video-mosaic">
+        <video muted loop playsinline preload="none"
+          src="https://github.com/CEA-LIST/Robot-WATCHDOG/releases/download/videos/Video_HAD_website_1.mp4"></video>
+        <video muted loop playsinline preload="none"
+          src="https://github.com/CEA-LIST/Robot-WATCHDOG/releases/download/videos/Video_HAD_website_2.mp4"></video>
+        <video muted loop playsinline preload="none"
+          src="https://github.com/CEA-LIST/Robot-WATCHDOG/releases/download/videos/Video_HAD_website_3.mp4"></video>
+        <video muted loop playsinline preload="none"
+          src="https://github.com/CEA-LIST/Robot-WATCHDOG/releases/download/videos/robot_watchdog_video_6.mp4"></video>
+        <video muted loop playsinline preload="none"
+          src="https://github.com/CEA-LIST/Robot-WATCHDOG/releases/download/videos/robot_watchdog_video_7.mp4"></video>
+        <video muted loop playsinline preload="none"
+          src="https://github.com/CEA-LIST/Robot-WATCHDOG/releases/download/videos/robot_watchdog_video_8.mp4"></video>
+      </div>
+    </div>
+  </section>
+  <!-- End video mosaic -->
+
+
   <!-- Motivation -->
   <section class="section hero is-small">
     <div class="container is-max-desktop">
@@ -529,7 +551,7 @@
         <div class="columns is-centered">
           <div class="column is-two-thirds">
             <img src="static/images/results_end2end.png" alt="End-to-end failure detection performance after conformal calibration"
-              class="mx-auto" style="max-width: 100%; height: auto;" />
+              class="figure-small" />
             <h2 class="subtitle has-text-centered">
               <strong>End-to-end failure detection after conformal calibration</strong> (MCC, averaged across tasks,
               seeds and configurations). Once Conformal Prediction converts anomaly scores into binary alerts —
@@ -616,120 +638,6 @@
       </div>
     </div>
   </section>
-
-
-  <!-- Video Grid Section -->
-  <!--
-       Videos are hosted as assets of the GitHub release tagged `video`, not committed to the repo.
-       Upload the files from `release_videos/` to that release, keeping the exact filenames below:
-         table_setting_nominal.mp4
-         table_setting_failure_wrong_side.mp4
-         table_setting_failure_misplaced.mp4
-         waste_sorting_nominal.mp4
-         waste_sorting_failure_wrong_bin.mp4
-         waste_sorting_failure_unsorted.mp4
-  -->
-  <section class="section">
-    <div class="container">
-      <h2 class="title is-3 has-text-centered">Real-time detection videos</h2>
-      <div class="columns is-centered">
-        <div class="column is-four-fifths">
-          <div class="content has-text-justified">
-            <p class="has-text-centered">
-              GnnT running online on the two tasks of the Watchdog dataset. The overlay shows the tracked object
-              nodes, the instantaneous failure score against its conformally calibrated threshold, and the per-node
-              status.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <h3 class="title is-4 has-text-centered">Table-setting (ALOHA)</h3>
-      <div class="columns is-multiline is-centered">
-
-        <div class="column is-one-third has-text-centered">
-          <figure>
-            <video controls muted loop autoplay playsinline width="100%" style="border-radius: 8px;">
-              <source
-                src="https://github.com/CEA-LIST/Robot-WATCHDOG/releases/download/video/table_setting_nominal.mp4"
-                type="video/mp4">
-              Your browser does not support the video tag.
-            </video>
-            <figcaption class="mt-2"><strong>Nominal execution.</strong> The score stays below the CP threshold for the
-              whole episode.</figcaption>
-          </figure>
-        </div>
-
-        <div class="column is-one-third has-text-centered">
-          <figure>
-            <video controls muted loop autoplay playsinline width="100%" style="border-radius: 8px;">
-              <source
-                src="https://github.com/CEA-LIST/Robot-WATCHDOG/releases/download/video/table_setting_failure_misplaced.mp4"
-                type="video/mp4">
-            </video>
-            <figcaption class="mt-2"><strong>Relational failure — misplaced cup.</strong> The episode analysed above:
-              the score crosses the threshold as the cup settles in the wrong spatial relation to the plate.
-            </figcaption>
-          </figure>
-        </div>
-
-        <div class="column is-one-third has-text-centered">
-          <figure>
-            <video controls muted loop autoplay playsinline width="100%" style="border-radius: 8px;">
-              <source
-                src="https://github.com/CEA-LIST/Robot-WATCHDOG/releases/download/video/table_setting_failure_wrong_side.mp4"
-                type="video/mp4">
-            </video>
-            <figcaption class="mt-2"><strong>Relational failure — wrong side.</strong> The glass ends up on the
-              opposite side of the plate from every expert demonstration; motion alone looks nominal.</figcaption>
-          </figure>
-        </div>
-
-      </div>
-
-      <h3 class="title is-4 has-text-centered mt-5">Waste sorting on a conveyor belt (SO-100)</h3>
-      <div class="columns is-multiline is-centered">
-
-        <div class="column is-one-third has-text-centered">
-          <figure>
-            <video controls muted loop autoplay playsinline width="100%" style="border-radius: 8px;">
-              <source
-                src="https://github.com/CEA-LIST/Robot-WATCHDOG/releases/download/video/waste_sorting_nominal.mp4"
-                type="video/mp4">
-            </video>
-            <figcaption class="mt-2"><strong>Nominal execution.</strong> Each item reaches its correct bin; the score
-              never crosses the threshold.</figcaption>
-          </figure>
-        </div>
-
-        <div class="column is-one-third has-text-centered">
-          <figure>
-            <video controls muted loop autoplay playsinline width="100%" style="border-radius: 8px;">
-              <source
-                src="https://github.com/CEA-LIST/Robot-WATCHDOG/releases/download/video/waste_sorting_failure_wrong_bin.mp4"
-                type="video/mp4">
-            </video>
-            <figcaption class="mt-2"><strong>Identity sorting error.</strong> A plastic item is dropped into the cans
-              bin — a purely relational error, detected as the score jumps well above the threshold.</figcaption>
-          </figure>
-        </div>
-
-        <div class="column is-one-third has-text-centered">
-          <figure>
-            <video controls muted loop autoplay playsinline width="100%" style="border-radius: 8px;">
-              <source
-                src="https://github.com/CEA-LIST/Robot-WATCHDOG/releases/download/video/waste_sorting_failure_unsorted.mp4"
-                type="video/mp4">
-            </video>
-            <figcaption class="mt-2"><strong>Missed objects.</strong> Items are left unsorted at the end of the
-              episode; the score rises and stays above the threshold.</figcaption>
-          </figure>
-        </div>
-
-      </div>
-    </div>
-  </section>
-  <!-- End video grid -->
 
 
   <!-- Limitations -->

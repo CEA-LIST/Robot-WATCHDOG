@@ -157,12 +157,12 @@ body {
   margin: 0 auto;
 }
 
-/* Video mosaic below the abstract */
+/* Video grids (highlight after the abstract, full mosaic in Qualitative results) */
 .video-mosaic {
   display: grid;
-  grid-template-columns: 1fr;
-  gap: 16px;
-  max-width: 800px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  max-width: 1000px;
   margin: 0 auto;
 }
 
@@ -173,4 +173,10 @@ body {
   border-radius: 6px;
   background: #000;
   cursor: pointer;
+}
+
+@media screen and (max-width: 768px) {
+  .video-mosaic {
+    grid-template-columns: 1fr;
+  }
 }

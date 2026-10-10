@@ -8,7 +8,7 @@
     content="Robot-WATCHDOG: a self-supervised failure detection framework for robotic manipulation based on object-centric spatio-temporal graphs. CoRL 2026.">
   <meta property="og:title" content="Robot-WATCHDOG: Failure Detection through Object-Centric Graph Representation" />
   <meta property="og:description"
-    content="A self-supervised failure detection framework that represents manipulation scenes as spatio-temporal graphs over tracked objects, combining a predictive graph transformer (GnnT) with a non-parametric few-shot detector (TPC). CoRL 2026." />
+    content="A self-supervised failure detection framework that represents manipulation scenes as object-centric spatio-temporal graphs, with two failure scores: a non-parametric geometric and relational measure (TPC) and a predictive graph transformer (GnnT). CoRL 2026." />
   <meta property="og:url" content="https://cea-list.github.io/Robot-WATCHDOG/" />
   <meta property="og:image" content="static/images/teaser.png" />
   <meta property="og:image:width" content="1200" />
@@ -154,25 +154,19 @@
           <h2 class="title is-3">Abstract</h2>
           <div class="content has-text-justified">
             <p>
-              Reliable real-time failure detection is critical for deploying learned robotic policies in real-world
-              environments. However, explicitly enumerating failures is intractable in open-world settings, making
-              failure detection from nominal demonstrations alone a necessary alternative. Existing approaches face key
-              limitations: purely visual methods are highly sensitive to benign background variations, while kinematic
-              monitors lack awareness of the surrounding environment. Crucially, both often fail to capture
-              <em>relational</em> errors involving object identity, spatial arrangement, or task progression, such as
-              grasping the wrong object or violating interaction structure. In this work, we introduce
-              <strong>Robot-WATCHDOG</strong>, a self-supervised failure detection framework based on an object-centric
-              representation of dynamic scenes as spatio-temporal graphs over tracked labeled objects and their
-              interactions. Within this representation, the framework deploys two complementary methods to adapt across
-              data regimes. For data-rich settings, we propose <strong>GnnT</strong>, a predictive graph transformer
-              that identifies failures as deviations from learned object-centric spatio-temporal dynamics. To address
-              data scarcity, we introduce <strong>Trajectory Projection and Correlation (TPC)</strong>, a
-              non-parametric method that detects failures through geometric consistency and changes in object-relation
-              dynamics in extreme few-shot scenarios. We evaluate the framework on a public benchmark and a newly
-              collected dataset featuring relationally challenging manipulation tasks. Results show that modeling
-              object-centric spatial and temporal interactions improves failure detection over existing baselines and
-              enables reliable detection of failure modes that are difficult to capture using visual or kinematic
-              monitoring alone.
+              Reliable real-time failure detection is critical for deploying learned robotic policies, yet defining
+              failures explicitly is infeasible in open-world settings. This motivates failure detection from nominal
+              demonstrations alone. Existing methods, however, struggle to balance robustness to benign variations
+              with the ability to capture semantic and interaction-level errors. We introduce
+              <strong>Robot-WATCHDOG</strong>, a self-supervised framework that models manipulation scenes as
+              object-centric spatio-temporal graphs. Building on this representation, we investigate two complementary
+              failure scores: <strong>Trajectory Projection and Correlation (TPC)</strong>, a non-parametric measure
+              of geometric deviation and relational consistency, and <strong>GnnT</strong>, a Graph Attention Network
+              with a Transformer that predicts future object states. We evaluate both on a public benchmark and on a
+              new dataset of semantically complex manipulation tasks, across six tasks and ten random seeds. Both
+              scores outperform image-based failure detectors, particularly on semantic and interaction-level
+              failures. TPC provides the strongest performance in AUPR and MCC on both dataset averages, with low
+              variance across seeds.
             </p>
           </div>
         </div>
@@ -254,6 +248,12 @@
                 consistency</strong> through velocity features and graph sequences, enabling detection of both
               instantaneous and sequential deviations.
             </p>
+            <p>
+              Within this representation we define two scoring functions, both referenced or trained on nominal
+              demonstrations only, and both turned into binary decisions by the same conformal calibration. At every
+              timestep each scorer produces one value per tracked object; the scalar failure score
+              \( S_{\text{total}} \) is their sum over objects.
+            </p>
           </div>
         </div>
       </div>
@@ -312,10 +312,23 @@
     <div class="container is-max-desktop">
       <div class="columns is-centered">
         <div class="column is-four-fifths">
-          <h2 class="title is-3 has-text-centered">Two detectors, two data regimes</h2>
+          <h2 class="title is-3 has-text-centered">Two failure scores</h2>
           <div class="content has-text-justified">
             <p>
-              <strong>GnnT — predictive spatio-temporal dynamics.</strong> Spatial structure is encoded with
+              <strong>TPC — geometric and relational consistency.</strong> The first scorer is non-parametric: it
+              compares the observed episode directly to the set of expert trajectories, without fitting any model.
+              For each tracked object, Trajectory Projection and Correlation computes the orthogonal projection
+              distance from the observed trajectory to the closest expert trajectory of the same label, aggregated
+              over time with exponentially increasing weights so that recent deviations dominate. Since the per-point
+              distance does not depend on the prefix, the score of a streaming episode is maintained incrementally at
+              constant cost per timestep. To capture deviations in interaction structure rather than in individual
+              kinematics, TPC adds a correlation penalty: the \( \ell_1 \) divergence between the pairwise Pearson
+              correlation matrices of the observed objects and of the nominal dataset.
+            </p>
+            <p>
+              <strong>GnnT — predictive spatio-temporal dynamics.</strong> The second scorer replaces the direct
+              comparison to expert trajectories by a learned model of the nominal dynamics, and flags deviations from
+              predicted object states. Spatial structure is encoded with
               <a href="https://arxiv.org/abs/2105.14491" target="_blank">GATv2</a> dynamic attention, so that the
               network can weight task-relevant interactions (e.g. an end-effector approaching a target object) more
               strongly than distant or weakly coupled entities. To model action–reaction delays, a sliding window of
@@ -323,24 +336,19 @@
               Transformer encoder, with a composite positional encoding accounting for relative time within the
               window, object identity, and global episode progress. The current-step tokens are projected by an MLP to
               predict object positions over a horizon \( L \). The network is trained <em>solely on nominal
-                demonstrations</em>, minimizing trajectory MSE together with an edge-consistency term that encourages
-              agreement between predicted and observed pairwise spatial relations:
+                demonstrations</em>, minimizing trajectory MSE together with an edge-consistency term:
               \( \mathcal{L} = \lambda_p \mathcal{L}_{\text{pos}} + \lambda_e \mathcal{L}_{\text{edge}} \).
-              At runtime, failures appear as prediction error.
+              This formulation can represent action–reaction delays that a purely geometric comparison cannot, at the
+              cost of requiring enough demonstrations to fit the model.
             </p>
             <p>
-              <strong>TPC — extreme few-shot fallback.</strong> With fewer than about 25 episodes, predictive models
-              overfit. Trajectory Projection and Correlation is a non-parametric alternative: it scores individual
-              kinematic deviation as the time-weighted orthogonal projection distance to the closest expert
-              trajectory, and adds a correlation penalty measuring the \( \ell_1 \) divergence between the pairwise
-              Pearson correlation matrices of the observed scene and of the nominal dataset. The result is a purely
-              geometric detector that needs no training.
-            </p>
-            <p>
-              <strong>Calibration by conformal prediction.</strong> Both detectors are calibrated the same way, which
-              removes any arbitrary task-specific threshold tuning. Non-conformity scores are computed on a held-out
-              calibration set of nominal episodes, and for a user-specified tolerance \( \alpha \in (0,1) \) the
-              decision threshold is the \( (1-\alpha) \)-quantile of those scores.
+              <strong>Calibration by conformal prediction.</strong> Both scores are calibrated the same way, without
+              task-specific threshold tuning and without any failure examples. Non-conformity scores are computed on a
+              held-out calibration set of nominal episodes, and for a user-specified tolerance \( \alpha \in (0,1) \)
+              a <em>time-varying</em> threshold \( \eta_t \) is built with a functional split-conformal construction:
+              its width is the \( (1-\alpha) \)-quantile of the maximum deviation of calibration episodes from the
+              mean nominal profile. Since we use the uncorrected empirical quantile, the resulting level is treated as
+              approximate.
             </p>
           </div>
         </div>
@@ -490,20 +498,21 @@
             <p>
               We compare against trajectory-matching baselines (AP-RMS, AP-Fréchet, Soft-DTW), learned representations
               (logpZO, lopO, AE-Recon) and the visual-semantic detector
-              <a href="https://cea-list.github.io/FIDeL/" target="_blank">FIDeL</a>. Across both datasets and all
-              metrics, our object-centric methods consistently outperform prior work: TPC and GnnT reach AUPR scores of
-              <strong>0.69–0.78</strong> and MCC scores of <strong>0.67–0.72</strong>, whereas the strongest baseline
-              reaches only 0.47 and 0.40.
+              <a href="https://cea-list.github.io/FIDeL/" target="_blank">FIDeL</a>. Every number is averaged over
+              <strong>ten seeds</strong>, each redrawing the expert train/calibration partition, the network
+              initialisation and the conformal split.
             </p>
             <p>
-              The two variants split along data availability, exactly as designed. <strong>TPC</strong> achieves the
-              highest MCC on BotFails (<strong>0.666</strong>), where limited training data favours its non-parametric
-              formulation, while <strong>GnnT</strong> performs best on the more dynamic Watchdog dataset
-              (<strong>0.719</strong> MCC), showing that predictive spatio-temporal modeling benefits continuous and
-              delayed interactions. Trajectory metrics perform substantially worse because they evaluate trajectories
-              independently and therefore cannot capture relational deviations between objects; density,
-              reconstruction and visual baselines are less consistent, suggesting that implicit latent representations
-              struggle to encode structured object interactions robustly.
+              Both object-centric scores outperform image-based detectors, and <strong>TPC</strong> is consistently
+              the stronger of the two: averaged per dataset it reaches AUPR <strong>0.811</strong> / maximum MCC
+              <strong>0.751</strong> on BotFails and <strong>0.810</strong> / <strong>0.719</strong> on Watchdog,
+              against 0.623 / 0.488 and 0.648 / 0.631 for <strong>GnnT</strong>, while the strongest baselines reach
+              only 0.442 / 0.320 (AP-RMS, BotFails) and 0.346 / 0.344 (AP-Fréchet, Watchdog). Trajectory metrics
+              evaluate objects independently, cannot express relational deviations, and are the least stable of all,
+              with seed-to-seed standard deviations up to 0.19 AUPR on the Watchdog average — an order of magnitude
+              above TPC (0.013). Density, reconstruction and visual baselines are steadier but plateau well below both
+              of our scores. The learned score only approaches TPC in the continuously dynamic conveyor scene, which
+              indicates where learned dynamics may justify their additional complexity.
             </p>
           </div>
         </div>
@@ -518,14 +527,14 @@
       <div class="container has-text-centered">
         <div class="single-image-display">
           <div class="item" style="max-width: 100%; width: 100%;">
-            <img src="static/images/results_threshold_independent.png"
+            <img src="static/images/fig04_threshold_independent.png"
               alt="Threshold-independent discriminative performance: AUPR and MCC" class="mx-auto"
               style="max-width: 100%; height: auto;" />
             <h2 class="subtitle has-text-centered">
               <strong>Threshold-independent discriminative performance.</strong> Average Area Under the
               Precision–Recall Curve (AUPR) and maximum Matthews Correlation Coefficient (MCC) across the BotFails and
-              Watchdog datasets. Error bars denote the standard deviation across task subsets; best results are framed
-              in purple with a star.
+              Watchdog datasets. Error bars denote the standard deviation across 10 seeds; best results are framed in
+              purple with a star.
             </h2>
           </div>
         </div>
@@ -540,15 +549,17 @@
       <div class="container has-text-centered">
         <div class="columns is-centered">
           <div class="column is-two-thirds">
-            <img src="static/images/results_end2end.png" alt="End-to-end failure detection performance after conformal calibration"
+            <img src="static/images/fig05_end_to_end_mcc.png" alt="End-to-end failure detection performance after conformal calibration"
               class="figure-small" />
             <h2 class="subtitle has-text-centered">
-              <strong>End-to-end failure detection after conformal calibration</strong> (MCC, averaged across tasks,
-              seeds and configurations). Once Conformal Prediction converts anomaly scores into binary alerts —
-              without any manual threshold tuning — both variants outperform prior methods by a clear margin: GnnT
-              reaches <strong>0.657</strong> MCC on the Watchdog dataset and TPC <strong>0.483</strong> on BotFails,
-              while FIDeL and FAIL-Detect remain below 0.15. Improvements in raw anomaly scoring therefore transfer
-              reliably to calibrated online detection.
+              <strong>End-to-end failure detection after conformal calibration</strong> (MCC, modulation
+              \( s_1 \), averaged over the tasks of each dataset, over 10 seeds and over
+              \( \alpha \in [0.80, 0.95] \); error bars: standard deviation across seeds). With conformal prediction
+              converting scores into binary alerts, TPC again leads on both datasets (<strong>0.675</strong> on
+              BotFails, <strong>0.641</strong> on Watchdog), ahead of GnnT (0.347, 0.571), while the best online
+              baselines reach 0.220 (FIDeL, BotFails) and 0.329 (logpZO, Watchdog). Gains in raw scoring do not
+              transfer mechanically: baseline rankings change between the two settings, and each method has its own
+              useful tolerance range — calibration is a design choice to report in its own right.
             </h2>
           </div>
         </div>
@@ -655,10 +666,10 @@
               Robot-WATCHDOG relies on a discrete object-centric abstraction, which limits applicability to tasks
               involving highly deformable materials, fluids, or interaction domains without a clear object
               decomposition (e.g. painting or soldering). Performance also depends on the upstream vision-language
-              tracking pipeline: severe occlusions, missed detections or identity switches degrade graph quality and
+              tracking pipeline: severe occlusions, missed detections or identity switches can degrade graph quality and
               propagate to the anomaly detector. Finally, the current formulation models object centroids only, and
-              therefore cannot capture failures involving orientation or fine-grained pose — extending the graph
-              representation with reliable 6D pose estimates is a natural direction for future work.
+              therefore cannot capture failures involving orientation or fine-grained pose. Extending the graph
+              representation with 6D pose estimates is a natural direction for future work.
             </p>
           </div>
         </div>
@@ -673,6 +684,7 @@
       <figure class="image" style="margin: 0 auto; max-width: 300px;">
         <img src="static/images/dog_cropped.gif" alt="Robot-WATCHDOG mascot">
       </figure>
+      <p class="is-size-7 has-text-grey mt-2">Illustration by Charlotte Sczwarc</p>
     </div>
   </section>
 
